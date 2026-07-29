@@ -363,6 +363,9 @@ There are some collection checks under `ENABLE_UNITY_COLLECTIONS_CHECKS` in both
 - Not integrated with **[Netcode for GameObjects](https://docs.unity3d.com/Packages/com.unity.netcode.gameobjects@latest/)**. While both Netcode for Entities and Netcode for GameObjects support custom Network Interfaces, Netcode for GameObjects integration requires subclassing `NetworkTransport` for a higher level interaction with Steamworks. I made the `SteamNetworkInterface` public, so you can try to implement it yourself. But I am not sure whether it is worth doing this, as there are some other Steamworks integrations for Netcode for GameObjects available, e.g., [this](https://github.com/Unity-Technologies/multiplayer-community-contributions/tree/main/Transports/com.community.netcode.transport.steamnetworkingsockets) or [this](https://github.com/Unity-Technologies/multiplayer-community-contributions/tree/main/Transports/com.community.netcode.transport.facepunch).
 
 
+- Sockets interface version is hardcoded in SteamAPI.cs and requires updating the code of Network Transport Over Steamworks whenever the native Steamworks library is upgraded. This is a limitation of Steamworks SDK. Steamworks.NET has the same issue.
+
+
 ## AI use disclosure
 
 The initial prototype was implemented by AI. It was then fully rewritten manually, except that I did few AI requests that resulted in some minor code changes. I extensively consulted with AI to get a better understanding of Steamworks SDK and how it can be integrated with Netcode for Entities. Few documentation comments were improved with AI. AI autocompletion was enabled in the IDE.

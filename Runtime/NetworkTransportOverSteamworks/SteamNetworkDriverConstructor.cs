@@ -129,7 +129,7 @@ namespace NetworkTransportOverSteamworks {
                     messagesPerReceive,
                     worlds);
             }
-            catch(Exception e) {
+            catch {
                 succeeded = false;
                 throw;
             }
@@ -184,7 +184,7 @@ namespace NetworkTransportOverSteamworks {
                     messagesPerReceive,
                     worlds);
             }
-            catch(Exception e) {
+            catch {
                 succeeded = false;
                 throw;
             }
@@ -245,7 +245,7 @@ namespace NetworkTransportOverSteamworks {
                     messagesPerReceive,
                     worlds);
             }
-            catch(Exception e) {
+            catch {
                 succeeded = false;
                 throw;
             }
@@ -335,7 +335,7 @@ namespace NetworkTransportOverSteamworks {
                 Log.NetworkDriverConstructor.Initialized();
                 return true;
             }
-            catch(Exception e) {
+            catch {
                 succeeded = false;
                 throw;
             }
@@ -407,7 +407,7 @@ namespace NetworkTransportOverSteamworks {
 
                 Log.NetworkDriverConstructor.Deinitialized();
             }
-            catch(Exception e) {
+            catch {
                 succeeded = false;
                 throw;
             }

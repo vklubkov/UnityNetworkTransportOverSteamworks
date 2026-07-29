@@ -29,7 +29,7 @@ namespace NetworkTransportOverSteamworks {
 #endif
 
         // STEAMNETWORKINGSOCKETS_INTERFACE_VERSION
-        public static readonly FixedString64Bytes SocketsVersion = "SteamNetworkingSockets012";
+        public static readonly FixedString64Bytes SocketsVersion = "SteamNetworkingSockets013";
 
         [DllImport(_nativeLib,
             EntryPoint = "SteamAPI_GetHSteamUser",
