@@ -1,0 +1,15 @@
+{
+  "name": "com.vklubkov.transportoversteamworks",
+  "version": "1.0.0",
+  "displayName": "Network Transport Over Steamworks",
+  "unity": "6000.3",
+  "author": {
+    "name": "Vladimir Klubkov",
+    "email": "vladimir.gamedev@gmail.com"
+  },
+  "dependencies": {
+    "com.unity.burst": "1.8.29",
+    "com.unity.collections": "2.6.7",
+    "com.unity.transport": "2.6.0"
+  }
+}
