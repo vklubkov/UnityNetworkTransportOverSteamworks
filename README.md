@@ -1,5 +1,7 @@
 # Network Transport Over Steamworks For Netcode For Entities
 
+![](.github/logo.png)
+
 Network transport for Unity **[Netcode for Entities](https://docs.unity3d.com/Packages/com.unity.netcode@latest/)** implemented using Steamworks SDK (`ISteamNetworkingSockets`).
 
 - Created specifically for use with **Netcode for Entities**.
@@ -8,28 +10,38 @@ Network transport for Unity **[Netcode for Entities](https://docs.unity3d.com/Pa
 
 - Supports **P2P**, **Fake IP**, and **real IP** connections. Servers/hosts can have all three types of listen sockets at the same time.
 
-- Conversion between Steanworks messages <-> Unity Transport packets is done via **bursted jobs**.
+- Conversion between Steamworks messages <-> Unity Transport packets is done via **bursted jobs**.
 
-**This package only handles data transfer. It doesn't initialize Steamworks, doesn't handle matchmaking, doesn't initiate connections, doesn't start sockets etc.**
+****This package only handles the data transfer over Steamworks.  It doesn't initialize Steamworks, doesn't initialize Netcode for Entities, doesn't handle matchmaking, doesn't initiate connections, doesn't start sockets etc.**
 
-**Doesn't bundle the Steamworks SDK DLL.**
+**It also doesn't bundle the Steamworks SDK DLL.**
 
 
 ## Installation
 
 - Open the Unity Package Manager.
 - Click the `+` button and select `Add package from git URL...`
-- Enter the following URL: `https://github.com/vklubkov/UnityNetworkTransportOverSteamworks.git`, or, if you want to use SSH: `git@github.com:vklubkov/UnityNetworkTransportOverSteamworks.git`
+- Enter the following URL: 
+  ```
+  https://github.com/vklubkov/UnityNetworkTransportOverSteamworks.git
+  ```
+  Or, if you want to use SSH: 
+  ```
+  git@github.com:vklubkov/UnityNetworkTransportOverSteamworks.git
+  ```
 
 
 ## Getting started
 
+This example shows how you can set up the host (the client-hosted server) and the client.
+
 ### Host
 
 ```csharp
-// Init Steamworks
-// (Optional) init relay network
+// 1. Init Steamworks
+// 2. (Optional) init relay network
 
+// 3.
 var sockets = SteamNetworkDriverConstructor.GetSteamUserSockets();
 
 SteamNetworkDriverConstructor.InitializeClientAndServer(
@@ -37,59 +49,66 @@ SteamNetworkDriverConstructor.InitializeClientAndServer(
     SteamNetworkInterfaceType.IP,
     SteamNetworkInterfaceTypeFlags.IP | SteamNetworkInterfaceTypeFlags.P2P);
 
-// Create client and server worlds
-// load the networked scene into the worlds
-// Create listen sockets, poll groups, and client conneciton via Steamworks
+// 4. Create client and server worlds
+// 5. Load the networked scene into the worlds
+// 6. Create listen sockets, poll groups, and client conneciton via Steamworks
 
+// 7.
 SteamNetworkEndpoint.CreateForListenSockets(
     out var serverEndpoint,
     SteamNetworkInterfaceTypeFlags.IP | SteamNetworkInterfaceTypeFlags.P2P,
     listenSocketP2P, pollGroupP2P,
     listenSocketIP, pollGroupIP);
 
+// 8.
 SteamNetworkEndpoint.CreateForConnection(
     out var clientEndpoint,
     SteamNetworkInterfaceTypeFlags.IP,
     clientConnection);
 
-// Use NetworkStreamDriver.Listen(serverEndpoint) in server world
-// Use NetworkStreamDriver.Connect(clientEndpoint) in client world
+// 9. Use `NetworkStreamDriver.Listen(serverEndpoint)` in server world
+// 10. Use `NetworkStreamDriver.Connect(clientEndpoint)` in client world
 ```
 
 ### Client
 
-Note: this is a P2P client, for which you need multiple machines with different Steam IDs. For local testing in Unity Editor using `Window -> Multiplayer -> Multiplayer Play Mode`, create IP-based clients.
+Note: for testing P2P clients, you need multiple machines running the Steam app with different Steam users. But for local testing in Unity Editor, via `Window -> Multiplayer -> Multiplayer Play Mode`, you can use IP-based clients.
 
 ```csharp
-// Init Steamworks
-// (Optional) init relay network
+// 1. Init Steamworks
+// 2. (Optional) init relay network
 
+// 3.
 var sockets = SteamNetworkDriverConstructor.GetSteamUserSockets();
 
+// 4.
 SteamNetworkDriverConstructor.InitializeClient(
     sockets, 
     SteamNetworkInterfaceType.P2P);
 
-// Create client world
-// load the networked scene into the world
-// Create client conneciton via Steamworks
+// 5. Create client world
+// 6. Load the networked scene into the world
+// 7. Create client conneciton via Steamworks
 
+// 8.
 SteamNetworkEndpoint.CreateForConnection(
     out var clientEndpoint,
     SteamNetworkInterfaceTypeFlags.P2P,
     clientConnection);
 
-// Use NetworkStreamDriver.Connect(clientEndpoint) in client world
+// 9. Use `NetworkStreamDriver.Connect(clientEndpoint)` in client world
 ```
 
-Disconnect should be handled through Steamworks and Netcode for Entities, Network Transport Over Steamworks is not involved. 
+Disconnect should be handled through Steamworks and Netcode for Entities, Network Transport Over Steamworks is not involved.
 
-During the full cleanup, you can reset the network drivers in Netcode for Entities using `SteamNetworkDriverConstructor.Deinitialize();`
+When you want to reset the drivers in Netcode for Entities, you can do so using `SteamNetworkDriverConstructor.Deinitialize();`
+
+*Not related to Network Transport Over Steamworks itself, but I shoudl probably mention that properly disconnecting from Steamworks could be improtant. I experienced a crash in Unity Editor on Linux when I didn't diconnect before deinitializing Steamworks, which worked just fine on Windows.*
 
 
 ## Documentation
 
-### SteamNetworkDriverConstructor
+### SteamNetworkDriverConstructor class
 
 ```csharp
 /// Returns the pointer to the Steamworks sockets.
@@ -173,15 +192,15 @@ static bool InitializeClientAndServer(
 /// Resets the driver constructor in Netcode for Entities, so any new
 /// drivers created after this call use the default Netcode constructor.
 /// Also updates the drivers of the existing worlds, but only if they
-/// are specified in the worlds< parameter. Errors while updating
+/// are specified in the `worlds` parameter. Errors while updating
 /// the drivers of the existing worlds are reported to the console.    
 static bool Deinitialize(List<World> worlds = null)
 ```
 
-Other methods of the class are automatically called by Netcode for Entities.
+Other methods of SteamNetworkDriverConstructor are automatically called by Netcode for Entities.
 
 
-### SteamNetworkInterfaceType
+### SteamNetworkInterfaceType enum
 
 ```csharp
 public enum SteamNetworkInterfaceType {
@@ -194,7 +213,7 @@ public enum SteamNetworkInterfaceType {
 Allows you to specify the network interface type for clients.
 
 
-### SteamNetworkInterfaceTypeFlags
+### SteamNetworkInterfaceTypeFlags enum
 
 ```csharp
 [Flags]
@@ -208,7 +227,7 @@ public enum SteamNetworkInterfaceTypeFlags {
 Same as `SteamNetworkInterfaceType`, but flags, allowing you to specify multiple types of network interfaces for servers.
 
 
-### SteamSendFlags
+### SteamSendFlags enum
 
 ```csharp
 [Flags]
@@ -227,7 +246,7 @@ public enum SteamSendFlags {
 An enum representing the send flags as described in the Steamworks SDK documentation for [steamnetworkingtypes.h](https://partner.steamgames.com/doc/api/steamnetworkingtypes) and [SendMessageToConnection](https://partner.steamgames.com/doc/api/ISteamNetworkingSockets#SendMessageToConnection).
 
 
-### SteamNetworkEndpoint
+### SteamNetworkEndpoint class
 
 A set of methods that help populate and read custom Steamworks socket and connection data from the `NetworkEndpoint`.
 
@@ -307,9 +326,11 @@ static void GetSteamListenSockets(
 ```
 
 
-### SteamNetworkInterface
+### SteamNetworkInterface struct
 
-The actual interface used by Unity Transport to streamline the messages through Steamworks. You don't have to interact with it directly. It is only made public to enable custom setups without the use of `SteamNetworkDriverConstructor`. In which case you are only interested in its constructors, other methods of the class are automatically called by Unity Transport.
+The actual interface used by Unity Transport to streamline the messages through Steamworks. You don't have to interact with it directly. 
+
+It is only made public to enable custom setups without the use of `SteamNetworkDriverConstructor`. In which case you are only interested in its constructors, other methods class are automatically called by Unity Transport.
 
 ```csharp
 SteamNetworkInterface(
@@ -319,7 +340,7 @@ SteamNetworkInterface(
     SteamSendFlags sendFlags = Defaults.SendFlags, 
     int messagesPerReceive = Defaults.MessagesPerReceive)
 ```
-Use this constructor when Netcode for Entities is not installed or when you don't want to use its `NetDebug`. `isServer` should be set to `true` if the interface is used for a server (including client-hosted servers), and to `false` if it is used for a client. Other parameters are similar to `SteamNetworkDriverConstructor.Initialize...` methods.
+Use this constructor when Netcode for Entities is not installed or when you don't want to use its `NetDebug`. `isServer` should be set to `true` if the interface is used for a server (**including client-hosted servers**), and to `false` if it is used for a client. Other parameters are similar to `SteamNetworkDriverConstructor.Initialize...` methods.
 
 ```csharp
 SteamNetworkInterface(
@@ -330,12 +351,12 @@ SteamNetworkInterface(
     SteamSendFlags sendFlags = Defaults.SendFlags,
     int messagesPerReceive = Defaults.MessagesPerReceive)
 ```
-Use this constructor when Netcode for Entities is installed and you want to use its `NetDebug`. `isServer` should be set to `true` if the interface is used for a server (including client-hosted servers), and to `false` if it is used for a client. Other parameters are similar to `SteamNetworkDriverConstructor.Initialize...` methods.
+Use this constructor when Netcode for Entities is installed and you want to use its `NetDebug`. `isServer` should be set to `true` if the interface is used for a server (**including client-hosted servers**), and to `false` if it is used for a client. Other parameters are similar to `SteamNetworkDriverConstructor.Initialize...` methods.
 
 
-### NetDebug
+### NetDebug struct
 
-A stub for the `NetDebug` struct used when Netcode for Entities is not installed. It has to be public due to its presence in the `SteamNetworkInterface` constructor. You don't need to interact with it in any way.
+A stub for the `NetDebug` struct used when Netcode for Entities is not installed. It has to be public due to its presence in the `SteamNetworkInterface` constructor. You don't have to interact with it in any way.
 
 
 ### Debugging and optimization
@@ -344,31 +365,33 @@ A stub for the `NetDebug` struct used when Netcode for Entities is not installed
 |-------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `NETWORK_TRANSPORT_OVER_STEAMWORKS_DISABLE_LOGGING`   | Disables logging (and tracing, if enabled) in Network Transport Over Steamworks.                                                                                                                                                                                    |
 | `NETWORK_TRANSPORT_OVER_STEAMWORKS_ENABLE_TRACING`    | Enables tracing in Network Transport Over Steamworks. To see the tracing logs, you should go to `Window -> Multiplayer -> Play Mode Tools`, enable `Force Log Settings` and select the `Debug` log level. For builds, you can enable the needed log level via code. |
-| `NETWORK_TRANSPORT_OVER_STEAMWORKS_DISABLE_RICH_LOGS` | Disables the Rich Text tags in Network Transport Over Steamworks log messages. This only affects Editor as in builds Rich Text is not enabled.                                                                                                                      |
+| `NETWORK_TRANSPORT_OVER_STEAMWORKS_DISABLE_RICH_LOGS` | Disables the Rich Text tags in Network Transport Over Steamworks log messages. This only affects Editor, as Rich Text is disabled in builds.                                                                                                                      |
 
 There are some collection checks under `ENABLE_UNITY_COLLECTIONS_CHECKS` in both bursted and not bursted code. These checks will likely not be present in release builds.
 
 
 ## Known issues and limitations
 
-- Network Transport Over Steamworks doesn't check whether SteamAPI/GameServer, Relay Network, or anything else is initialized and available. It will call into native functions regardless. Steamworks SDK handles this automatically in some way, but if that's not enough for you, you should handle this at a higher level.
+- Network Transport Over Steamworks doesn't check whether SteamAPI/GameServer, Relay Network, or anything else is initialized and available. It always calls into native functions, as Steamworks SDK promises to handle this. If that's not enough, you can handle this manually at a higher level.
 
 
 - Send/Receive jobs that do Steam <-> Netcode message conversion aren't parallelized. Processing received messages in parallel seems doable, but for sending, the previous job should be synchronized (otherwise, I found no way to get the number of Netcode packets in the queue), which makes it not worth it. All other implementations of `INetworkInterace` I've seen so far also run their jobs synchronously.
 
 
-- The `NetworkEndpoint` for listen sockets is composite, so you can start all listen sockets in a single `Listen` call. This is due to how Netcode for Entities handles listening: it loops over all existing drivers, and if a driver is already listening, it throws an exception.
+- The `NetworkEndpoint` for listen sockets is composite, so you start all listen sockets in a single `Listen` call. This is due to how Netcode for Entities handles listening: it loops over all existing drivers, and if a driver is already listening, it throws an exception. 
 
 
-- Not integrated with **[Netcode for GameObjects](https://docs.unity3d.com/Packages/com.unity.netcode.gameobjects@latest/)**. While both Netcode for Entities and Netcode for GameObjects support custom Network Interfaces, Netcode for GameObjects integration requires subclassing `NetworkTransport` for a higher level interaction with Steamworks. I made the `SteamNetworkInterface` public, so you can try to implement it yourself. But I am not sure whether it is worth doing this, as there are some other Steamworks integrations for Netcode for GameObjects available, e.g., [this](https://github.com/Unity-Technologies/multiplayer-community-contributions/tree/main/Transports/com.community.netcode.transport.steamnetworkingsockets) or [this](https://github.com/Unity-Technologies/multiplayer-community-contributions/tree/main/Transports/com.community.netcode.transport.facepunch).
+- Not integrated with **[Netcode for GameObjects](https://docs.unity3d.com/Packages/com.unity.netcode.gameobjects@latest/)**. While both Netcode for Entities and Netcode for GameObjects support custom Network Interfaces, Netcode for GameObjects integration requires subclassing `NetworkTransport` for a higher level interaction with Steamworks. I made the `SteamNetworkInterface` public, so you can try to implement it yourself. But I am not sure whether it is worth doing this, as there are some other Steamworks integrations for Netcode for GameObjects available, including [this](https://github.com/Unity-Technologies/multiplayer-community-contributions/tree/main/Transports/com.community.netcode.transport.steamnetworkingsockets) and [this](https://github.com/Unity-Technologies/multiplayer-community-contributions/tree/main/Transports/com.community.netcode.transport.facepunch).
 
 
-- Sockets interface version is hardcoded in SteamAPI.cs and requires updating the code of Network Transport Over Steamworks whenever the native Steamworks library is upgraded. This is a limitation of Steamworks SDK. Steamworks.NET has the same issue.
+- Sockets interface version is hardcoded in *SteamAPI.cs*, and I need to update this version whenever the native Steamworks library upgrades the sockets interface. This is a limitation of Steamworks SDK. Steamworks.NET has the same issue. In case you need to do this yourself, you can copy the package to *Packages* folder (Unity Package Manager has the `Customize` option hidden in a dropdown, which does exactly this), find *Runtime/NetworkTransportOverSteamworks/Internal/NativeAPI/SteamAPI.cs*, then `NetworkTransportOverSteamworks.SteamAPI.SocketsVersion` inside of it, and change the version. This should work for as long as the actual Steamworks APIs used by Network Transport Over Steamworks remain unchanged.
+
+
 
 
 ## AI use disclosure
 
-The initial prototype was implemented by AI. It was then fully rewritten manually, except that I did few AI requests that resulted in some minor code changes. I extensively consulted with AI to get a better understanding of Steamworks SDK and how it can be integrated with Netcode for Entities. Few documentation comments were improved with AI. AI autocompletion was enabled in the IDE.
+The initial prototype was implemented by AI. It was then fully rewritten manually, except that I did few AI requests that resulted in some minor code changes. I extensively consulted with AI to get a better understanding of Steamworks SDK and how it can be integrated with Netcode for Entities. Logo was generated with AI. Few documentation comments were improved with AI. AI autocompletion was enabled in the IDE. 
 
 
 ## License
@@ -399,7 +422,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-Tthe platform define guard in the begining of each source file is copied from [Steamworks.NET](https://github.com/rlabrecque/steamworks.net). Steamworks.NET is distributed under the [MIT license](Third%20Party%20Notices.md) as well:
+The platform define guard in the begining of each source file was copied from [Steamworks.NET](https://github.com/rlabrecque/steamworks.net). Steamworks.NET is distributed under the [MIT](Third%20Party%20Notices.md) license:
 
 ```
 The MIT License (MIT)
